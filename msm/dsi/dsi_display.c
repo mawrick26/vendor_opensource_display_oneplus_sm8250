@@ -2090,11 +2090,6 @@ int dsi_display_set_power(struct drm_connector *connector,
 	struct drm_panel_notifier notifier_data;
 	int blank;
 
-#ifdef CONFIG_F2FS_OF2FS
-	struct drm_panel_notifier notifier_data_f2fs;
-	int blank_f2fs;
-#endif
-
 	if (!display || !display->panel) {
 		DSI_ERR("invalid display/panel\n");
 		return -EINVAL;
@@ -2133,11 +2128,6 @@ int dsi_display_set_power(struct drm_connector *connector,
 		DSI_ERR("DRM_PANEL_BLANK_UNBLANK_CUST\n");
 		if (lcd_active_panel)
 			drm_panel_notifier_call_chain(lcd_active_panel, DRM_PANEL_EARLY_EVENT_BLANK, &notifier_data);
-#ifdef CONFIG_F2FS_OF2FS
-		blank_f2fs = DRM_PANEL_BLANK_UNBLANK_CUST;
-		notifier_data_f2fs.data = &blank_f2fs;
-		f2fs_panel_notifier_call_chain(DRM_PANEL_EARLY_EVENT_BLANK, &notifier_data_f2fs);
-#endif
 		/* send screen on cmd for tp end */
 		break;
 	case SDE_MODE_DPMS_OFF:
@@ -2147,11 +2137,6 @@ int dsi_display_set_power(struct drm_connector *connector,
 		DSI_ERR("DRM_PANEL_BLANK_POWERDOWN_CUST\n");
 		if (lcd_active_panel)
 			drm_panel_notifier_call_chain(lcd_active_panel, DRM_PANEL_EARLY_EVENT_BLANK, &notifier_data);
-#ifdef CONFIG_F2FS_OF2FS
-		blank_f2fs = DRM_PANEL_BLANK_POWERDOWN_CUST;
-		notifier_data_f2fs.data = &blank_f2fs;
-		f2fs_panel_notifier_call_chain(DRM_PANEL_EARLY_EVENT_BLANK, &notifier_data_f2fs);
-#endif
 		/* send screen off cmd for tp end */
 		break;
 	default:
@@ -4950,7 +4935,6 @@ static int dsi_display_res_init(struct dsi_display *display)
 		INIT_DELAYED_WORK(&display->panel->gamma_read_work, dsi_display_gamma_read_work);
 		DSI_ERR("INIT_DELAYED_WORK: dsi_display_gamma_read_work\n");
 	}
-
 
 	return 0;
 error_ctrl_put:
@@ -9051,6 +9035,7 @@ int dsi_display_update_pps(char *pps_cmd, void *disp)
 
 	return 0;
 }
+
 int dsi_display_set_acl_mode(struct drm_connector *connector, int level)
 {
     struct dsi_display *dsi_display = NULL;
